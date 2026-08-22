@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Visible Tab Snapshot Copier",
+  "version": "1.0.0",
+  "description": "現在表示中のタブを撮影し、画像としてクリップボードへコピーします。",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "action": {
+    "default_title": "画面を撮影してコピー",
+    "default_popup": "popup.html"
+  }
+}
