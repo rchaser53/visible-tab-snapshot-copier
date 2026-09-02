@@ -5,8 +5,23 @@
   "description": "現在表示中のタブを撮影し、画像としてクリップボードへコピーします。",
   "permissions": [
     "activeTab",
-    "clipboardWrite"
+    "clipboardWrite",
+    "offscreen",
+    "downloads",
+    "storage"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "capture-snapshot": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "表示中のタブを撮影してコピー"
+    }
+  },
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",

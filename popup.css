@@ -49,6 +49,32 @@ button:disabled {
   opacity: 0.6;
 }
 
+.save-path-label {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+#save-path {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 5px;
+  padding: 7px 8px;
+  border: 1px solid #9ca3af;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+}
+
+button.secondary {
+  background: #4b5563;
+}
+
+button.secondary:hover {
+  background: #374151;
+}
+
 .status {
   min-height: 18px;
   margin-top: 8px;

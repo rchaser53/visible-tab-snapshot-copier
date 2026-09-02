@@ -11,6 +11,9 @@
       <h1>スナップショット</h1>
       <p class="description">現在表示中の範囲を画像としてコピーします。</p>
       <button id="capture" type="button">撮影してコピー</button>
+      <label class="save-path-label" for="save-path">保存先（ダウンロードフォルダ内）</label>
+      <input id="save-path" type="text" value="ChatGPT Snapshots" spellcheck="false">
+      <button id="save" type="button" class="secondary">PNGとして保存</button>
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </main>
     <script src="popup.js"></script>
