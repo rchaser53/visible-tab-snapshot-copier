@@ -13,6 +13,18 @@
       <button id="capture" type="button">撮影してコピー</button>
       <label class="save-path-label" for="save-path">保存先（ダウンロードフォルダ内）</label>
       <input id="save-path" type="text" value="ChatGPT Snapshots" spellcheck="false">
+      <fieldset class="image-size">
+        <legend>保存サイズ（px）</legend>
+        <div class="size-inputs">
+          <label for="save-width">幅</label>
+          <input id="save-width" type="number" min="1" step="1" placeholder="元の幅" inputmode="numeric">
+          <span aria-hidden="true">×</span>
+          <label for="save-height">高さ</label>
+          <input id="save-height" type="number" min="1" step="1" placeholder="元の高さ" inputmode="numeric">
+        </div>
+        <label class="ratio-label"><input id="keep-ratio" type="checkbox" checked> 縦横比を維持</label>
+        <p id="image-size-hint" class="size-hint">未指定の場合は元のサイズで保存します。</p>
+      </fieldset>
       <button id="save" type="button" class="secondary">PNGとして保存</button>
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </main>
