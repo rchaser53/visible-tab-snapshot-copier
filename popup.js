@@ -16,6 +16,11 @@ async function captureSnapshot() {
   return chrome.tabs.captureVisibleTab(null, { format: "png" });
 }
 
+async function openChatGptTab() {
+  const response = await chrome.runtime.sendMessage({ type: "open-chatgpt-tab" });
+  if (!response?.ok) throw new Error("ChatGPTのタブを開けませんでした。");
+}
+
 function loadImage(dataUrl) {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -73,6 +78,7 @@ async function captureAndCopy() {
       new ClipboardItem({ "image/png": imageBlob })
     ]);
 
+    await openChatGptTab();
     setStatus("コピーしました。貼り付けできます。");
     // コピー完了をユーザーが確認できるよう、少しだけポップアップを残す。
     setTimeout(() => window.close(), 600);
@@ -112,6 +118,7 @@ async function captureAndSave() {
       conflictAction: "uniquify"
     });
     await chrome.storage.local.set({ savePath: folder });
+    await openChatGptTab();
     setStatus("PNGを保存しました。");
     setTimeout(() => window.close(), 600);
   } catch (error) {
