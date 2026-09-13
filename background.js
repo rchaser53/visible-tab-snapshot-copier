@@ -1,18 +1,44 @@
 let captureInProgress = false;
+const DEFAULT_TARGET_URL = "https://chatgpt.com/";
 
-async function openChatGptTab() {
-  const tabs = await chrome.tabs.query({ url: ["https://chatgpt.com/*"] });
-  const chatGptTab = tabs.find((tab) => tab.id !== undefined);
+function normalizeTargetUrl(value) {
+  const url = new URL(value || DEFAULT_TARGET_URL);
+  if (!/^https?:$/.test(url.protocol)) {
+    throw new Error("対象URLにはhttpまたはhttpsを指定してください。");
+  }
+  return url;
+}
 
-  if (chatGptTab) {
-    await chrome.tabs.update(chatGptTab.id, { active: true });
-    if (chatGptTab.windowId !== undefined) {
-      await chrome.windows.update(chatGptTab.windowId, { focused: true });
+async function getStoredTargetUrl() {
+  const { targetUrl } = await chrome.storage.local.get("targetUrl");
+  try {
+    return normalizeTargetUrl(targetUrl).toString();
+  } catch {
+    return DEFAULT_TARGET_URL;
+  }
+}
+
+async function openTargetTab(targetUrl = null) {
+  const configuredUrl = normalizeTargetUrl(targetUrl || await getStoredTargetUrl());
+  const tabs = await chrome.tabs.query({});
+  const targetTab = tabs.find((tab) => {
+    if (tab.id === undefined || !tab.url) return false;
+    try {
+      return new URL(tab.url).origin === configuredUrl.origin;
+    } catch {
+      return false;
+    }
+  });
+
+  if (targetTab) {
+    await chrome.tabs.update(targetTab.id, { active: true });
+    if (targetTab.windowId !== undefined) {
+      await chrome.windows.update(targetTab.windowId, { focused: true });
     }
     return;
   }
 
-  await chrome.tabs.create({ url: "https://chatgpt.com/" });
+  await chrome.tabs.create({ url: configuredUrl.toString() });
 }
 
 async function ensureOffscreenDocument() {
@@ -40,7 +66,7 @@ async function captureAndCopy() {
     await ensureOffscreenDocument();
     const result = await chrome.runtime.sendMessage({ type: "copy-snapshot", dataUrl });
     if (!result?.ok) throw new Error("Clipboard copy was rejected");
-    await openChatGptTab();
+    await openTargetTab();
   } catch (error) {
     console.error("Snapshot capture failed", error);
   } finally {
@@ -53,7 +79,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // ポップアップはタブ切り替えと同時に閉じるため、先に応答して処理を継続する。
   sendResponse({ ok: true });
-  openChatGptTab().catch((error) => {
+  openTargetTab(message.targetUrl).catch((error) => {
     console.error("Could not open ChatGPT tab", error);
   });
   return false;

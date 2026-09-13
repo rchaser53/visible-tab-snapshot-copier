@@ -11,6 +11,9 @@
       <h1>スナップショット</h1>
       <p class="description">現在表示中の範囲を画像としてコピーします。</p>
       <button id="capture" type="button">撮影してコピー</button>
+      <label class="target-url-label" for="target-url">処理後に開くホスト</label>
+      <input id="target-url" type="url" value="https://chatgpt.com/" spellcheck="false" placeholder="https://example.com/">
+      <p class="target-url-hint">同じホストのタブがあればアクティブにし、なければ新しく開きます。</p>
       <label class="save-path-label" for="save-path">保存先（ダウンロードフォルダ内）</label>
       <input id="save-path" type="text" value="ChatGPT Snapshots" spellcheck="false">
       <fieldset class="image-size">

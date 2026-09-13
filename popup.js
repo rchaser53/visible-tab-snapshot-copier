@@ -1,5 +1,6 @@
 const captureButton = document.querySelector("#capture");
 const saveButton = document.querySelector("#save");
+const targetUrlInput = document.querySelector("#target-url");
 const savePathInput = document.querySelector("#save-path");
 const saveWidthInput = document.querySelector("#save-width");
 const saveHeightInput = document.querySelector("#save-height");
@@ -16,8 +17,24 @@ async function captureSnapshot() {
   return chrome.tabs.captureVisibleTab(null, { format: "png" });
 }
 
-async function openChatGptTab() {
-  const response = await chrome.runtime.sendMessage({ type: "open-chatgpt-tab" });
+function getTargetUrl() {
+  const value = targetUrlInput.value.trim();
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("開くホストには有効なURLを指定してください。");
+  }
+  if (!/^https?:$/.test(url.protocol)) {
+    throw new Error("開くホストにはhttpまたはhttpsを指定してください。");
+  }
+  return `${url.origin}/`;
+}
+
+async function openTargetTab() {
+  const targetUrl = getTargetUrl();
+  await chrome.storage.local.set({ targetUrl });
+  const response = await chrome.runtime.sendMessage({ type: "open-chatgpt-tab", targetUrl });
   if (!response?.ok) throw new Error("ChatGPTのタブを開けませんでした。");
 }
 
@@ -78,7 +95,7 @@ async function captureAndCopy() {
       new ClipboardItem({ "image/png": imageBlob })
     ]);
 
-    await openChatGptTab();
+    await openTargetTab();
     setStatus("コピーしました。貼り付けできます。");
     // コピー完了をユーザーが確認できるよう、少しだけポップアップを残す。
     setTimeout(() => window.close(), 600);
@@ -118,7 +135,7 @@ async function captureAndSave() {
       conflictAction: "uniquify"
     });
     await chrome.storage.local.set({ savePath: folder });
-    await openChatGptTab();
+    await openTargetTab();
     setStatus("PNGを保存しました。");
     setTimeout(() => window.close(), 600);
   } catch (error) {
@@ -142,8 +159,9 @@ function updateImageSizeHint() {
 saveWidthInput.addEventListener("input", updateImageSizeHint);
 saveHeightInput.addEventListener("input", updateImageSizeHint);
 
-chrome.storage.local.get("savePath").then(({ savePath }) => {
+chrome.storage.local.get(["savePath", "targetUrl"]).then(({ savePath, targetUrl }) => {
   if (typeof savePath === "string") savePathInput.value = savePath;
+  if (typeof targetUrl === "string") targetUrlInput.value = targetUrl;
 });
 
 captureButton.addEventListener("click", captureAndCopy);
